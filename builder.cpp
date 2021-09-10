@@ -1,5 +1,5 @@
 /*
- * Example of `builder' design pattern.
+ * Example of `builder' design pattern  (Creational Pattern).
  * a builder pattern encapsulates or hides the process of building 
  * a complex object and separates the representation of the object 
  * and its construction. The separation allows us to construct different 
