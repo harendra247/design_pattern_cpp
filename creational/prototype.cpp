@@ -14,117 +14,137 @@
 #include <string>
 
 /* Prototype base class. */
-class Prototype
-{
-    protected:
-        std::string type;
-        int value;
+using std::string;
 
-    public:
-        virtual Prototype* clone() = 0;
+// Prototype Design Pattern
+// Intent: Lets you copy existing objects without making your code dependent on
+// their classes.
 
-        std::string getType()
-        {
-            return type;
-        }
-
-        int getValue()
-        {
-            return value;
-        }
+enum Type {
+  PROTOTYPE_1 = 0,
+  PROTOTYPE_2
 };
 
-class ConcretePrototype1 : public Prototype
-{
-    public:
-        ConcretePrototype1(int number)
-        {
-            type  = "Type1";
-            value = number;
-        }
-        
-        Prototype* clone()
-        {
-            return new ConcretePrototype1(*this);
-        }
+/**
+ * The example class that has cloning ability. We'll see how the values of field
+ * with different types will be cloned.
+ */
+
+class Prototype {
+ protected:
+  string prototype_name_;
+  float prototype_field_;
+
+ public:
+  Prototype() {}
+  Prototype(string prototype_name)
+      : prototype_name_(prototype_name) {
+  }
+  virtual ~Prototype() {}
+  virtual Prototype *Clone() const = 0;
+  virtual void Method(float prototype_field) {
+    this->prototype_field_ = prototype_field;
+    std::cout << "Call Method from " << prototype_name_ << " with field : " << prototype_field << std::endl;
+  }
 };
 
-class ConcretePrototype2 : public Prototype
-{
-    public:
-        ConcretePrototype2(int number)
-        {
-            type  = "Type2";
-            value = number;
-        }
+/**
+ * ConcretePrototype1 is a Sub-Class of Prototype and implement the Clone Method
+ * In this example all data members of Prototype Class are in the Stack. If you
+ * have pointers in your properties for ex: String* name_ ,you will need to
+ * implement the Copy-Constructor to make sure you have a deep copy from the
+ * clone method
+ */
 
-        Prototype* clone()
-        {
-            return new ConcretePrototype2(*this);
-        }
+class ConcretePrototype1 : public Prototype {
+ private:
+  float concrete_prototype_field1_;
+
+ public:
+  ConcretePrototype1(string prototype_name, float concrete_prototype_field)
+      : Prototype(prototype_name), concrete_prototype_field1_(concrete_prototype_field) {
+  }
+
+  /**
+   * Notice that Clone method return a Pointer to a new ConcretePrototype1
+   * replica. so, the client (who call the clone method) has the responsability
+   * to free that memory. I you have smart pointer knowledge you may prefer to
+   * use unique_pointer here.
+   */
+  Prototype *Clone() const override {
+    return new ConcretePrototype1(*this);
+  }
 };
 
-/* Factory that manages prorotype instances and produces their clones. */
-class ObjectFactory
-{
-    static Prototype* type1value1;
-    static Prototype* type1value2;
-    static Prototype* type2value1;
-    static Prototype* type2value2;
+class ConcretePrototype2 : public Prototype {
+ private:
+  float concrete_prototype_field2_;
 
-    public:
-        static void  initialize()
-        {
-            type1value1 = new ConcretePrototype1(1);
-            type1value2 = new ConcretePrototype1(2);
-            type2value1 = new ConcretePrototype2(1);
-            type2value2 = new ConcretePrototype2(2);
-        }
-
-        static Prototype* getType1Value1()
-        {
-            return type1value1->clone();
-        }
-
-        static Prototype* getType1Value2()
-        {
-            return type1value2->clone();
-        }
-
-        static Prototype* getType2Value1()
-        {
-            return type2value1->clone();
-        }
-
-        static Prototype* getType2Value2()
-        {
-            return type2value2->clone();
-        }
+ public:
+  ConcretePrototype2(string prototype_name, float concrete_prototype_field)
+      : Prototype(prototype_name), concrete_prototype_field2_(concrete_prototype_field) {
+  }
+  Prototype *Clone() const override {
+    return new ConcretePrototype2(*this);
+  }
 };
 
-Prototype* ObjectFactory::type1value1 = 0;
-Prototype* ObjectFactory::type1value2 = 0;
-Prototype* ObjectFactory::type2value1 = 0;
-Prototype* ObjectFactory::type2value2 = 0;
+/**
+ * In PrototypeFactory you have two concrete prototypes, one for each concrete
+ * prototype class, so each time you want to create a bullet , you can use the
+ * existing ones and clone those.
+ */
 
-int main()
-{
-    ObjectFactory::initialize();
-    Prototype* object;
+class PrototypeFactory {
+ private:
+  std::unordered_map<Type, Prototype *, std::hash<int>> prototypes_;
 
-    /* All the object were created by cloning the prototypes. */
-    object = ObjectFactory::getType1Value1();
-    std::cout << object->getType() << ": " << object->getValue() << std::endl;
+ public:
+  PrototypeFactory() {
+    prototypes_[Type::PROTOTYPE_1] = new ConcretePrototype1("PROTOTYPE_1 ", 50.f);
+    prototypes_[Type::PROTOTYPE_2] = new ConcretePrototype2("PROTOTYPE_2 ", 60.f);
+  }
 
-    object = ObjectFactory::getType1Value2();
-    std::cout << object->getType() << ": " << object->getValue() << std::endl;
+  /**
+   * Be carefull of free all memory allocated. Again, if you have smart pointers
+   * knowelege will be better to use it here.
+   */
 
-    object = ObjectFactory::getType2Value1();
-    std::cout << object->getType() << ": " << object->getValue() << std::endl;
+  ~PrototypeFactory() {
+    delete prototypes_[Type::PROTOTYPE_1];
+    delete prototypes_[Type::PROTOTYPE_2];
+  }
 
-    object = ObjectFactory::getType2Value2();
-    std::cout << object->getType() << ": " << object->getValue() << std::endl;
+  /**
+   * Notice here that you just need to specify the type of the prototype you
+   * want and the method will create from the object with this type.
+   */
+  Prototype *CreatePrototype(Type type) {
+    return prototypes_[type]->Clone();
+  }
+};
 
+void Client(PrototypeFactory &prototype_factory) {
+  std::cout << "Let's create a Prototype 1\n";
 
-    return 0;
+  Prototype *prototype = prototype_factory.CreatePrototype(Type::PROTOTYPE_1);
+  prototype->Method(90);
+  delete prototype;
+
+  std::cout << "\n";
+
+  std::cout << "Let's create a Prototype 2 \n";
+
+  prototype = prototype_factory.CreatePrototype(Type::PROTOTYPE_2);
+  prototype->Method(10);
+
+  delete prototype;
+}
+
+int main() {
+  PrototypeFactory *prototype_factory = new PrototypeFactory();
+  Client(*prototype_factory);
+  delete prototype_factory;
+
+  return 0;
 }
