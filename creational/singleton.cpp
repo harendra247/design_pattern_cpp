@@ -26,8 +26,13 @@ class Singleton
       
       static Singleton *m_pInstance;
       static std::mutex m_mutex;
+   protected:
+       Singleton(const std::string value): m_value(value)
+       { }
+       ~Singleton() {}
+       std::string m_value;
    public:
-      static Singleton& getInstance()
+      static Singleton& getInstance(std::string m_value)
       {
          // Double-checked locking pattern
          if(!m_pInstance)
@@ -35,23 +40,51 @@ class Singleton
             lock_guard<mutex> _lock(m_mutex); 
             if(!m_pInstance)
             {
-               m_pInstance = new Singleton;
+               m_pInstance = new Singleton(m_value);
             }
          }
          // Return object instead of pointer
          return *m_pInstance; 
       }
+
+      std::string value() const {
+         return m_value;
+      } 
 };
 
 // Supported in C++ 11. nullptr is defined to initialize the pointer by null.
 Singleton* Singleton::m_pInstance = nullptr; 
 std::mutex Singleton::m_mutex; 
 
+void ThreadFoo(){
+    // Following code emulates slow initialization.
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    Singleton* singleton = Singleton::getInstance("FOO");
+    std::cout << singleton->value() << "\n";
+}
+
+void ThreadBar(){
+    // Following code emulates slow initialization.
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    Singleton* singleton = Singleton::getInstance("BAR");
+    std::cout << singleton->value() << "\n";
+}
 
 int main()
-{
-    //new Singleton(); // Won't work
-    Singleton s = Singleton::getInstance(); // Ok
+{   
+   //new Singleton(); // Won't work
+   Singleton s = Singleton::getInstance("FOO"); // Ok
+   std::cout << s->value() << "\n";
 
-    std::cout << "Object created" << std::endl;
+   std::cout << "Object created" << std::endl;
+   
+   std::cout <<"If you see the same value, then singleton was reused (yay!\n" <<
+                "If you see different values, then 2 singletons were created (booo!!)\n\n" <<
+                "RESULT:\n";   
+    std::thread t1(ThreadFoo);
+    std::thread t2(ThreadBar);
+    t1.join();
+    t2.join();
+    
+    return 0;
 }
