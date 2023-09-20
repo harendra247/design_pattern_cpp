@@ -14,33 +14,38 @@ using namespace std;
 class Singleton
 {
    private:
-   // Supported in C++ 11. To assign the member variable by their default values.
-   Singleton() = default;
-   ~Singleton() = default;
-   // Supported in C++ 11. move constructor
-   Singleton(const Singleton&) = delete; 
-   Singleton& operator=(const Singleton&) = delete;
-   static Singleton* m_pInstance;
+      // Supported in C++ 11. To assign the member variable by their default values.
+      Singleton() = default;
+      ~Singleton() = default;
+      // delete copy constructor and assignment
+      Singleton(const Singleton&) = delete; 
+      Singleton& operator=(const Singleton&) = delete;
+      // Supported in C++ 11. move constructor and move assignment
+      Singleton(Singleton&&) = delete; 
+      Singleton& operator=(Singleton&&) = delete;
+      
+      static Singleton *m_pInstance;
+      static std::mutex m_mutex;
    public:
-   static Singleton& getInstance()
-   {
-      // Double-checked locking pattern
-      if(!m_pInstance)
+      static Singleton& getInstance()
       {
-         mutex _mutex;
-         lock_guard<mutex> _lock(_mutex); 
+         // Double-checked locking pattern
          if(!m_pInstance)
          {
-            m_pInstance = new Singleton;
+            lock_guard<mutex> _lock(m_mutex); 
+            if(!m_pInstance)
+            {
+               m_pInstance = new Singleton;
+            }
          }
+         // Return object instead of pointer
+         return *m_pInstance; 
       }
-      // Return object instead of pointer
-      return *m_pInstance; 
-   }
 };
 
 // Supported in C++ 11. nullptr is defined to initialize the pointer by null.
 Singleton* Singleton::m_pInstance = nullptr; 
+std::mutex Singleton::m_mutex; 
 
 
 int main()
