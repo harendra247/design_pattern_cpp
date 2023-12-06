@@ -6,6 +6,8 @@ The abstraction will be able to delegate some (sometimes, most) of its calls to 
 will have a common interface, they’d be interchangeable inside the abstraction.
 */
 
+#include <iostream>
+#include <string>
 
 /**
  * The Implementation defines the interface for all implementation classes. It
@@ -16,9 +18,9 @@ will have a common interface, they’d be interchangeable inside the abstraction
  */
 
 class Implementation {
- public:
-  virtual ~Implementation() {}
-  virtual std::string OperationImplementation() const = 0;
+  public:
+    virtual ~Implementation() {}
+    virtual std::string OperationImplementation() const = 0;
 };
 
 /**
@@ -26,16 +28,16 @@ class Implementation {
  * implements the Implementation interface using that platform's API.
  */
 class ConcreteImplementationA : public Implementation {
- public:
-  std::string OperationImplementation() const override {
-    return "ConcreteImplementationA: Here's the result on the platform A.\n";
-  }
+  public:
+    std::string OperationImplementation() const override {
+      return "ConcreteImplementationA: Here's the result on the platform A.\n";
+    }
 };
 class ConcreteImplementationB : public Implementation {
- public:
-  std::string OperationImplementation() const override {
-    return "ConcreteImplementationB: Here's the result on the platform B.\n";
-  }
+  public:
+    std::string OperationImplementation() const override {
+      return "ConcreteImplementationB: Here's the result on the platform B.\n";
+    }
 };
 
 /**
@@ -48,32 +50,29 @@ class Abstraction {
   /**
    * @var Implementation
    */
- protected:
-  Implementation* implementation_;
+  protected:
+    Implementation* implementation_;
 
- public:
-  Abstraction(Implementation* implementation) : implementation_(implementation) {
-  }
+  public:
+    Abstraction(Implementation* implementation) : implementation_(implementation) { }
 
-  virtual ~Abstraction() {
-  }
+    virtual ~Abstraction() { }
 
-  virtual std::string Operation() const {
-    return "Abstraction: Base operation with:\n" +
+    virtual std::string Operation() const {
+      return "Abstraction: Base operation with:\n" +
            this->implementation_->OperationImplementation();
-  }
+    }
 };
 /**
  * You can extend the Abstraction without changing the Implementation classes.
  */
 class ExtendedAbstraction : public Abstraction {
- public:
-  ExtendedAbstraction(Implementation* implementation) : Abstraction(implementation) {
-  }
-  std::string Operation() const override {
-    return "ExtendedAbstraction: Extended operation with:\n" +
+  public:
+    ExtendedAbstraction(Implementation* implementation) : Abstraction(implementation) { }
+    std::string Operation() const override {
+      return "ExtendedAbstraction: Extended operation with:\n" +
            this->implementation_->OperationImplementation();
-  }
+    }
 };
 
 /**
