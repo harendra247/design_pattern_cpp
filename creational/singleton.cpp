@@ -29,7 +29,6 @@ class Singleton
    protected:
        Singleton(const std::string value): m_value(value)
        { }
-       ~Singleton() {}
        std::string m_value;
    public:
       static Singleton& getInstance(std::string m_value)
@@ -59,22 +58,22 @@ std::mutex Singleton::m_mutex;
 void ThreadFoo(){
     // Following code emulates slow initialization.
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    Singleton* singleton = Singleton::getInstance("FOO");
-    std::cout << singleton->value() << "\n";
+    Singleton& singleton = Singleton::getInstance("FOO");
+    std::cout << singleton.value() << "\n";
 }
 
 void ThreadBar(){
     // Following code emulates slow initialization.
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    Singleton* singleton = Singleton::getInstance("BAR");
-    std::cout << singleton->value() << "\n";
+    Singleton& singleton = Singleton::getInstance("BAR");
+    std::cout << singleton.value() << "\n";
 }
 
 int main()
 {   
    //new Singleton(); // Won't work
-   Singleton s = Singleton::getInstance("FOO"); // Ok
-   std::cout << s->value() << "\n";
+   Singleton& s = Singleton::getInstance("FOO"); // Ok
+   std::cout << s.value() << "\n";
 
    std::cout << "Object created" << std::endl;
    
