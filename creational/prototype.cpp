@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 
 /* Prototype base class. */
 using std::string;
