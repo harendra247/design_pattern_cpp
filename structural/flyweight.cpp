@@ -4,7 +4,9 @@ Flyweight is a structural design pattern that allows programs to support vast qu
 The pattern achieves it by sharing parts of object state between multiple objects. In other words, the Flyweight saves RAM by caching 
 the same data used by different objects.
 */
-
+#include <iostream>
+#include <unordered_map>
+#include <string>
 /**
  * Flyweight Design Pattern
  *
