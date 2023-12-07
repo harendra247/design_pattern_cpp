@@ -6,6 +6,7 @@ The proxy object has the same interface as a service, which makes it interchange
 */
 
 #include <iostream>
+#include <string>
 /**
  * The Subject interface declares common operations for both RealSubject and the
  * Proxy. As long as the client works with RealSubject using this interface,
