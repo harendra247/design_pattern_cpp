@@ -3,7 +3,8 @@ Facade is a structural design pattern that provides a simplified (but limited) i
 
 While Facade decreases the overall complexity of the application, it also helps to move unwanted dependencies to one place.
 */
-
+#include <iostream>
+#include <string>
 /**
  * The Subsystem can accept requests either from the facade or client directly.
  * In any case, to the Subsystem, the Facade is yet another client, and it's not
