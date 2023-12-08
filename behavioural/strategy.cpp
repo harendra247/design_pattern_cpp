@@ -4,7 +4,8 @@ Strategy is a behavioral design pattern that turns a set of behaviors into objec
 The original object, called context, holds a reference to a strategy object. The context delegates executing the behavior to the linked strategy object.
 In order to change the way the context performs its work, other objects may replace the currently linked strategy object with another one.
 */
-
+#include <iostream>
+#include <memory>
 /**
  * The Strategy interface declares operations common to all supported versions
  * of some algorithm.
