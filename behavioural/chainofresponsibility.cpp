@@ -4,7 +4,9 @@ Chain of Responsibility is behavioral design pattern that allows passing request
 The pattern allows multiple objects to handle the request without coupling sender class to the concrete classes of the receivers.
 The chain can be composed dynamically at runtime with any handler that follows a standard handler interface.
 */
-
+#include <iostream>
+#include <string>
+#include <vector>
 /**
  * The Handler interface declares a method for building the chain of handlers.
  * It also declares a method for executing a request.
