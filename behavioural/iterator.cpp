@@ -4,7 +4,8 @@ Iterator is a behavioral design pattern that allows sequential traversal through
 
 Thanks to the Iterator, clients can go over elements of different collections in a similar fashion using a single iterator interface.
 */
-
+#include <iostream>
+#include <vector>
 /**
  * Iterator Design Pattern
  *
